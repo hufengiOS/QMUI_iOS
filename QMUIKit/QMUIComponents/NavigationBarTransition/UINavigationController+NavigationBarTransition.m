@@ -26,6 +26,21 @@
 #import "UIView+QMUI.h"
 #import "QMUILog.h"
 
+static UIButton *QMUIFindButtonInView(UIView *view) {
+    if ([view isKindOfClass:UIButton.class]) {
+        return (UIButton *)view;
+    }
+    
+    for (UIView *subview in view.subviews) {
+        UIButton *button = QMUIFindButtonInView(subview);
+        if (button) {
+            return button;
+        }
+    }
+    
+    return nil;
+}
+
 /**
  *  为了响应<b>NavigationBarTransition</b>分类的功能，UIViewController需要做一些相应的支持。
  *  @see UINavigationController+NavigationBarTransition.h
@@ -82,7 +97,7 @@ QMUISynthesizeIdStrongProperty(qmui_specifiedTextColor, setQmui_specifiedTextCol
     __block UILabel *backButtonLabel = nil;
     [self.qmui_contentView.subviews enumerateObjectsWithOptions:NSEnumerationReverse usingBlock:^(__kindof UIView * _Nonnull subview, NSUInteger idx, BOOL * _Nonnull stop) {
         if ([subview isKindOfClass:NSClassFromString(@"_UIButtonBarButton")]) {
-            UIButton *titleButton = [subview valueForKeyPath:@"visualProvider.titleButton"];
+            UIButton *titleButton = QMUIFindButtonInView(subview);
             backButtonLabel = titleButton.titleLabel;
             *stop = YES;
         }

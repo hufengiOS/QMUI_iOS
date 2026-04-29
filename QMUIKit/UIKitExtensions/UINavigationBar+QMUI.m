@@ -359,7 +359,15 @@ NSString *const kShouldFixTitleViewBugKey = @"kShouldFixTitleViewBugKey";
 }
 
 - (UIView *)qmui_contentView {
-    return [self valueForKeyPath:@"visualProvider.contentView"];
+    for (UIView *subview in self.subviews) {
+        NSString *className = NSStringFromClass(subview.class);
+        if ([className containsString:@"UINavigationBarContentView"] ||
+            [className containsString:@"ContentView"]) {
+            return subview;
+        }
+    }
+    
+    return nil;
 }
 
 - (void)qmuinb_fixTitleViewLayoutInIOS16 {
